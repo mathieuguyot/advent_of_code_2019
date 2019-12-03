@@ -19,6 +19,18 @@ TEST_CASE("AOC3 - PART 1", "[find_intersection_points]")
     REQUIRE(res == 245);
 }
 
+TEST_CASE("AOC3 - PART 2", "[find_lowest_weighted_point]") 
+{
+    vector<line_segments> lines = parse_lines_file("../data/aoc_3.txt");
+    auto st = get_start_time();
+
+    points_set s = find_intersection_points(lines, {1,1});
+    int res = find_lowest_weighted_point(s);
+    log_end_aoc_part(st, to_string(res), 3, 2);
+    
+    REQUIRE(res == 48262);
+}
+
 TEST_CASE("AOC3 - nominal test", "[find_intersection_points]") 
 {
     vector<line_segments> lines = {
@@ -30,6 +42,7 @@ TEST_CASE("AOC3 - nominal test", "[find_intersection_points]")
     REQUIRE(s.find({4, 5}) != s.end());
     REQUIRE(s.find({7, 3}) != s.end());
     REQUIRE(find_shortest_manhattan_distance(s, {1, 8}) == 6);
+    REQUIRE(find_lowest_weighted_point(s) == 30);
 }
 
 
@@ -41,6 +54,7 @@ TEST_CASE("AOC3 - find_shortest_manhattan_distance test", "[find_shortest_manhat
     };
     points_set s = find_intersection_points(lines, {1,1});
     REQUIRE(find_shortest_manhattan_distance(s, {1,1}) == 159);
+    REQUIRE(find_lowest_weighted_point(s) == 610);
 
     lines = {
         {{RIGHT,98},{UP,47},{RIGHT,26},{DOWN,63},{RIGHT,33},{UP,87},{LEFT,62},{DOWN,20},{RIGHT,33},{UP,53},{RIGHT,51}},
@@ -48,6 +62,7 @@ TEST_CASE("AOC3 - find_shortest_manhattan_distance test", "[find_shortest_manhat
     };
     s = find_intersection_points(lines, {1,8});
     REQUIRE(find_shortest_manhattan_distance(s, {1,8}) == 135);
+    REQUIRE(find_lowest_weighted_point(s) == 410);
 }
 
 

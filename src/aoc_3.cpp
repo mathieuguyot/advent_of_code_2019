@@ -23,18 +23,33 @@ int find_shortest_manhattan_distance(const points_set& points, const point& cent
     return closest_manhattan_distance; 
 }
 
+int find_lowest_weighted_point(const points_set& points)
+{
+    int lowest_weighted_point = -1;
+
+    for(const auto& p : points)
+    {
+        if(lowest_weighted_point == -1 || lowest_weighted_point > p.weight)
+        {
+            lowest_weighted_point = p.weight;
+        }
+    }
+
+    return lowest_weighted_point; 
+}
+
 points_set find_intersection_points(const std::vector<line_segments>& lines, const point& central_port)
 {
     points_set overlaping_points = {};
     points_set visisted_points = {};
-    point current_position = central_port;
     bool is_second_wire = false;
 
     for(const auto& line : lines)
     {
+        point current_position = central_port;
+        current_position.weight = 0;
         for(const auto& seg : line)
         {
-            
             for(unsigned int i = 0; i < seg.intensity; ++i)
             {
                 switch(seg.dir)
@@ -52,11 +67,15 @@ points_set find_intersection_points(const std::vector<line_segments>& lines, con
                         current_position.x += 1;
                         break;
                 }
-                if(visisted_points.find(current_position) != visisted_points.end())
+                current_position.weight += 1;
+                auto visited_points_it = visisted_points.find(current_position);
+                if(visited_points_it != visisted_points.end())
                 {
                     if(is_second_wire)
                     {
-                        overlaping_points.insert(current_position);overlaping_points.insert(current_position);
+                        point weighted_point = point(current_position);
+                        weighted_point.weight += visited_points_it->weight;
+                        overlaping_points.insert(weighted_point);
                     }
                 }
                 else
@@ -69,9 +88,7 @@ points_set find_intersection_points(const std::vector<line_segments>& lines, con
             }
         }
         is_second_wire = true;
-        current_position = central_port;
     }
-
     return overlaping_points;
 }
 

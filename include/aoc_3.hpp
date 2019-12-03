@@ -23,7 +23,7 @@ struct line_segment {
 };
 
 struct point {
-    int x, y;
+    int x, y, weight;
 
     bool operator==(const point& p) const 
     {
@@ -41,6 +41,7 @@ typedef std::vector<line_segment> line_segments;
 typedef std::set<point> points_set;
 
 int find_shortest_manhattan_distance(const points_set& points, const point& central_port);
+int find_lowest_weighted_point(const points_set& points);
 points_set find_intersection_points(const std::vector<line_segments>& lines, const point& central_port);
 std::vector<line_segments> parse_lines_file(const std::string& file_path); 
 
