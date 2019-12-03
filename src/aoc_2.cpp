@@ -3,8 +3,6 @@
 #include <fstream>
 #include <sstream>
 
-#include <iostream>
-
 using namespace std;
 
 int find_noun_and_verb(const intcode_program_t& program)
