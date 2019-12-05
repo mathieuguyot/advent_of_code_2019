@@ -24,7 +24,7 @@ TEST_CASE("AOC1 - PART 2", "[compute_required_fuel_part_2]")
     module_masses_t masses = parse_module_masses_file("../data/aoc_1.txt");
     auto st = get_start_time();
     int res = compute_required_fuel_part_2(masses);
-    log_end_aoc_part(st, to_string(res), 1, 1);
+    log_end_aoc_part(st, to_string(res), 1, 2);
     REQUIRE(res == 5115845);
 }
 

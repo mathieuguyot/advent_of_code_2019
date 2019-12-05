@@ -26,7 +26,7 @@ TEST_CASE("AOC2 - PART 2", "[execute_program]")
 
     auto st = get_start_time();
     int res = find_noun_and_verb(program);
-    log_end_aoc_part(st, to_string(res), 2, 1);
+    log_end_aoc_part(st, to_string(res), 2, 2);
 
     REQUIRE(res == 3951);
 }
