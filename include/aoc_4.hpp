@@ -8,5 +8,6 @@
 #define MAX_PASSWORD 657474
 
 std::vector<int> find_correct_passwords();
+std::vector<int> find_correct_passwords_part_two();
 
 #endif
