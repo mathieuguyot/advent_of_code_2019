@@ -9,25 +9,25 @@ using namespace std;
 
 TEST_CASE("AOC3 - PART 1", "[find_intersection_points]") 
 {
-    vector<line_segments> lines = parse_lines_file("../data/aoc_3.txt");
     auto st = get_start_time();
 
+    vector<line_segments> lines = parse_lines_file("../data/aoc_3.txt");
     points_set s = find_intersection_points(lines, {1,1});
     int res = find_shortest_manhattan_distance(s, {1, 1});
+
     log_end_aoc_part(st, to_string(res), 3, 1);
-    
     REQUIRE(res == 245);
 }
 
 TEST_CASE("AOC3 - PART 2", "[find_lowest_weighted_point]") 
 {
-    vector<line_segments> lines = parse_lines_file("../data/aoc_3.txt");
     auto st = get_start_time();
 
+    vector<line_segments> lines = parse_lines_file("../data/aoc_3.txt");
     points_set s = find_intersection_points(lines, {1,1});
     int res = find_lowest_weighted_point(s);
+
     log_end_aoc_part(st, to_string(res), 3, 2);
-    
     REQUIRE(res == 48262);
 }
 

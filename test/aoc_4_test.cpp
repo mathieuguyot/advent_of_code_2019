@@ -3,8 +3,6 @@
 #include "aoc_4.hpp"
 #include "utils.hpp"
 
-#include <iostream>
-
 using namespace std;
 
 TEST_CASE("AOC4 - PART 1", "[find_corrects_passwords]") 

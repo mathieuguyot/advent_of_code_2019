@@ -7,27 +7,27 @@ using namespace std;
 
 TEST_CASE("AOC2 - PART 1", "[execute_program]") 
 {
+    auto st = get_start_time();
+
     intcode_program_t program = parse_intcode_program("../data/aoc_2.txt");
     program[1] = 12;    
     program[2] = 2;
-    auto st = get_start_time();
-
     program_execution_result_t res = execute_program(program);
 
     log_end_aoc_part(st, to_string(res.second[0]), 2, 1);
-
     REQUIRE(res.first == EXECUTION_OK);
     REQUIRE(res.second[0] == 6568671);
 }
 
 TEST_CASE("AOC2 - PART 2", "[execute_program]") 
+
 {
-    intcode_program_t program = parse_intcode_program("../data/aoc_2.txt");
-
     auto st = get_start_time();
-    int res = find_noun_and_verb(program);
-    log_end_aoc_part(st, to_string(res), 2, 2);
 
+    intcode_program_t program = parse_intcode_program("../data/aoc_2.txt");
+    int res = find_noun_and_verb(program);
+
+    log_end_aoc_part(st, to_string(res), 2, 2);
     REQUIRE(res == 3951);
 }
 

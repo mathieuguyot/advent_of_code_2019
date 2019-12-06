@@ -1,7 +1,5 @@
 #include "aoc_4.hpp"
 
-#include <iostream>
-
 using namespace std;
 
 vector<int> find_correct_passwords_part_two()
