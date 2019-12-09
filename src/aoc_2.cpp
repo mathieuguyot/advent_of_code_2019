@@ -15,7 +15,7 @@ int find_noun_and_verb(const Intcode_Program& program)
             cur_program[1] = cur_noun;
             cur_program[2] = cur_verb;
             Computation_result res = compute(cur_program);
-            if(res.second[0] == 19690720)
+            if(res.program[0] == 19690720)
             {
                 return 100 * cur_noun + cur_verb;
             }

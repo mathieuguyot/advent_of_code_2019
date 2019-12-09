@@ -3,7 +3,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include <queue>
 
 enum class Opcode {
     unknown = -1,
@@ -11,7 +11,11 @@ enum class Opcode {
     times = 2,
     end = 99,
     input = 3,
-    output = 4
+    output = 4,
+    jump_if_true = 5,
+    jump_if_false = 6,
+    less_than = 7,
+    equals = 8,
 };
 
 enum class Mode {
@@ -40,12 +44,19 @@ enum class Return_code {
     ok,
     wrong_opcode,
     wrong_index,
+    empty_input_queue
 };
 
 using Intcode_Program = std::map<int, int>;
-using Computation_result = std::pair<Return_code, Intcode_Program>;
+using Parameter_queue = std::queue<int>;
 
-Computation_result compute(const Intcode_Program& program, const std::vector<int>& input_parameters = std::vector<int>());
+struct Computation_result {
+    Return_code return_code;
+    Intcode_Program program;
+    Parameter_queue output_queue;
+};
+
+Computation_result compute(const Intcode_Program& program, const Parameter_queue& input = Parameter_queue());
 Intcode_Program parse_intcode_program_file(const std::string& file_path);
 
 #endif

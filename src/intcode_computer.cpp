@@ -10,7 +10,7 @@ Instruction int_to_instruction(int opcode)
 {
     Instruction i {Opcode::unknown, Mode::position, Mode::position, Mode::position};
 
-    if(opcode == 1 || opcode == 2 || opcode == 3 || opcode == 4 || opcode == 99)
+    if(opcode >= 1 && opcode <= 8 || opcode == 99)
     {
         i.code = static_cast<Opcode>(opcode);
     }
@@ -18,7 +18,7 @@ Instruction int_to_instruction(int opcode)
     {
         string str_opcode = to_string(opcode);
         opcode = stoi(str_opcode.substr(str_opcode.length() - 2));
-        if(opcode == 1 || opcode == 2 || opcode == 3 || opcode == 4 || opcode == 99)
+        if(opcode >= 1 && opcode <= 8 || opcode == 99)
         {
             i.code = static_cast<Opcode>(opcode);
             if(str_opcode.length() == 5)
@@ -70,21 +70,33 @@ Return_code get_value(Intcode_Program& program, Mode mode, int index, int& value
     return code;
 }
 
-Return_code opcode_add(Intcode_Program& program, const Instruction& i, int index)
+Return_code opcode_operator(Intcode_Program& program, const Instruction& i, int index, bool add_operator = true)
 {
     Return_code code = Return_code::ok;
     int a_value = -1;
     int b_value = -1;
-    int c_value = -1;
     if(
         index + 3 < program.size() &&
         get_value(program, i.param1_mode, index + 1, a_value) == Return_code::ok &&
-        get_value(program, i.param2_mode, index + 2, b_value) == Return_code::ok &&
-        get_value(program, i.param3_mode, index + 3, c_value) == Return_code::ok &&
-        program.find(program.at(c_value)) != program.end()
+        get_value(program, i.param2_mode, index + 2, b_value) == Return_code::ok
     )
     {
-        program[program.at(c_value)] = a_value + b_value;
+        if(i.code == Opcode::add)
+        {
+            program[program[index + 3]] = a_value + b_value;
+        }
+        else if(i.code == Opcode::times)
+        {
+            program[program[index + 3]] = a_value * b_value;
+        }
+        else if(i.code == Opcode::equals)
+        {
+            program[program[index + 3]] = a_value == b_value ? 1 : 0;
+        }
+        else if(i.code == Opcode::less_than)
+        {
+            program[program[index + 3]] = a_value < b_value ? 1 : 0;
+        }
     }
     else
     {
@@ -93,106 +105,147 @@ Return_code opcode_add(Intcode_Program& program, const Instruction& i, int index
     return code;
 }
 
+Return_code opcode_jump_if(Intcode_Program& program, const Instruction& i, int& index, bool jump_if_true = true)
+{
+    Return_code code = Return_code::ok;
+    int a_value = -1;
+    int b_value = -1;
+    if(
+        index + 2 < program.size() &&
+        get_value(program, i.param1_mode, index + 1, a_value) == Return_code::ok && 
+        get_value(program, i.param2_mode, index + 2, b_value) == Return_code::ok
+    )
+    {
+        if(jump_if_true && a_value != 0)
+        {
+            index = b_value;
+        }
+        else if(!jump_if_true && a_value == 0)
+        {
+            index = b_value;
+        }
+        else
+        {
+            index += 3;
+        }
+    }
+    else
+    {
+        code = Return_code::wrong_index;
+    }
 
-Computation_result compute(const Intcode_Program& program, const std::vector<int>& input_parameters)
+    return code;
+}
+
+Return_code opcode_input(Intcode_Program& program, int index, Parameter_queue& inputs)
+{
+    Return_code code = Return_code::ok;
+    if(inputs.size() == 0)
+    {
+        code = Return_code::empty_input_queue;
+    }
+    else if(index + 1 >= program.size())
+    {
+        code = Return_code::wrong_index;
+    }
+    else
+    {
+        program[program[index + 1]] = inputs.front();
+        inputs.pop();  
+    }
+    return code;
+}
+
+Return_code opcode_output(Intcode_Program& program, const Instruction& i, int index, Parameter_queue& outputs)
+{
+    Return_code code = Return_code::ok;
+    if(index + 1 >= program.size())
+    {
+        code = Return_code::wrong_index;
+    }
+    else if(i.param1_mode == Mode::immediate)
+    {
+        cout << "OUTPUT=" << program.at(index+1) << endl;
+        outputs.push(program.at(index+1));
+    }
+    else if(i.param1_mode == Mode::position && program.find(program.at(index + 1)) != program.end())
+    {
+        cout << "OUTPUT=" << program.at(program.at(index+1)) << endl;
+        outputs.push(program.at(program.at(index+1)));
+    }
+    else
+    {
+        code = Return_code::wrong_index;
+    }
+    
+    return code;
+}
+
+Computation_result compute(const Intcode_Program& program, const Parameter_queue& input_queue)
 {
     Return_code c = Return_code::ok;
     Intcode_Program p(program);
+    Parameter_queue inputs(input_queue);
+    Parameter_queue outputs;
 
     int param_index = 0;
     int cur_index = 0;
     Instruction i;
     do {
+        // Check the validity of cur_index
         if(cur_index >= program.size())
         {
             c = Return_code::wrong_index;
             break;
         }
+        // Parse new cur_index opcode
         i = int_to_instruction(p[cur_index]);
         if(i.code == Opcode::unknown)
         {
             c = Return_code::wrong_opcode;
             break;
         }
-        else if(i.code == Opcode::times || i.code == Opcode::add)
+
+        // Execute an operation 
+        if(i.code == Opcode::times || i.code == Opcode::add || i.code == Opcode::equals || i.code == Opcode::less_than)
         {
-            if(cur_index + 3 >= program.size())
+            c = opcode_operator(p, i, cur_index);
+            if(c != Return_code::ok)
             {
-                c = Return_code::wrong_index;
                 break;
-            }
-            int a = -1;
-            int b = -1;/*
-            if(i.param1_mode == Mode::position)
-            {
-                if(p.find(p[cur_index+1]) != p.end())
-                {
-                    a = p[p[cur_index+1]];
-                }
-                else
-                {
-                    c = Return_code::wrong_index;
-                    break;
-                }
-            }
-            else
-            {
-                a = p[cur_index+1];
-            }
-
-            if(i.param2_mode == Mode::position)
-            {
-                if(p.find(p[cur_index+2]) != p.end())
-                {
-                    b = p[p[cur_index+2]];
-                }
-                else
-                {
-                    c = Return_code::wrong_index;
-                    break;
-                }
-            }
-            else
-            {
-                b = p[cur_index+2];
-            }*/
-            get_value(p, i.param1_mode, cur_index + 1, a);
-            get_value(p, i.param2_mode, cur_index + 2, b);
-            int c = -1;
-            get_value(p, i.param3_mode, cur_index + 3, c);
-            cout << c << " " << p[cur_index+3] << endl;
-
-            if(i.code == Opcode::add) 
-            {
-                p[p[cur_index+3]] = a + b;
-            }
-            else
-            {
-                p[p[cur_index+3]] = a * b;
             }
             cur_index += 4;
         }
         else if(i.code == Opcode::input)
         {
-            p[p[cur_index + 1]] = input_parameters[param_index];
-            param_index += 1;
+            c = opcode_input(p, cur_index, inputs);
+                        if(c != Return_code::ok)
+            {
+                break;
+            }
             cur_index += 2;
         }
         else if(i.code == Opcode::output)
         {
-            if(i.param1_mode == Mode::position)
+            c = opcode_output(p, i, cur_index, outputs);
+            if(c != Return_code::ok)
             {
-                cout << "#" << cur_index << "   " << p[p[cur_index + 1]] << endl;
-            }
-            else
-            {
-                cout << "#" << cur_index << "   " << p[cur_index + 1] << endl;
+                break;
             }
             cur_index += 2;
         }
+        else if(i.code == Opcode::jump_if_true || i.code == Opcode::jump_if_false)
+        {
+            c = opcode_jump_if(p, i, cur_index, i.code == Opcode::jump_if_true);
+            if(c != Return_code::ok)
+            {
+                break;
+            }
+        }
+        
     } while(i.code != Opcode::end);
 
-    return {c, p};
+    return {c, p, outputs};
 }
 
 Intcode_Program parse_intcode_program_file(const std::string &file_path)

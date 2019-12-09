@@ -11,16 +11,25 @@ TEST_CASE("AOC5 - PART 1", "[compute]")
     auto st = get_start_time();
 
     Intcode_Program program = parse_intcode_program_file("../data/aoc_5.txt");
-    Computation_result res = compute(program, {1});
+    Parameter_queue inputs;
+    inputs.push(1);
+    Computation_result res = compute(program, inputs);
 
-    log_end_aoc_part(st, "TEST", 2, 1);
-    
-/*
-    for(Intcode_Program::const_iterator it = res.second.begin();
-        it != res.second.end(); ++it)
-    {
-        std::cout << it->first << " " << it->second << " " << "\n";
-    }*/
-    REQUIRE(res.first == Return_code::ok);
-    //REQUIRE(res.second[0] == 6568671);
+    log_end_aoc_part(st, to_string(res.output_queue.back()), 5, 1);
+    REQUIRE(res.return_code == Return_code::ok);
+    REQUIRE(res.output_queue.back() == 15508323);
+}
+
+TEST_CASE("AOC5 - PART 2", "[compute]") 
+{
+    auto st = get_start_time();
+
+    Intcode_Program program = parse_intcode_program_file("../data/aoc_5.txt");
+    Parameter_queue inputs;
+    inputs.push(5);
+    Computation_result res = compute(program, inputs);
+
+    log_end_aoc_part(st, to_string(res.output_queue.back()), 5, 1);
+    REQUIRE(res.return_code == Return_code::ok);
+    REQUIRE(res.output_queue.back() == 9006327);
 }

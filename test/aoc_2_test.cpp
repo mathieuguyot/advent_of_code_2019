@@ -15,9 +15,9 @@ TEST_CASE("AOC2 - PART 1", "[compute]")
     program[2] = 2;
     Computation_result res = compute(program);
 
-    log_end_aoc_part(st, to_string(res.second[0]), 2, 1);
-    REQUIRE(res.first == Return_code::ok);
-    REQUIRE(res.second[0] == 6568671);
+    log_end_aoc_part(st, to_string(res.program[0]), 2, 1);
+    REQUIRE(res.return_code == Return_code::ok);
+    REQUIRE(res.program[0] == 6568671);
 }
 
 TEST_CASE("AOC2 - PART 2", "[find_noun_and_verb]") 
