@@ -38,6 +38,7 @@ set(SRC_TEST
     test/aoc_6_test.cpp
     test/aoc_7_test.cpp
     test/aoc_8_test.cpp
+    test/aoc_9_test.cpp
     test/intcode_computer_test.cpp
     test/aoc_test_main.cpp
 )

@@ -8,11 +8,25 @@
 
 using namespace std;
 
-Instruction int_to_instruction(int opcode)
+Mode char_to_mode(char c)
+{
+    Mode m = Mode::position;
+    if(c == '1')
+    {
+        m = Mode::immediate;
+    }
+    else if(c == '2')
+    {
+        m = Mode::relative;
+    }
+    return m;
+}
+
+Instruction int_to_instruction(Code opcode)
 {
     Instruction i {Opcode::unknown, Mode::position, Mode::position, Mode::position};
 
-    if(opcode >= 1 && opcode <= 8 || opcode == 99)
+    if(opcode >= 1 && opcode <= 9 || opcode == 99)
     {
         i.code = static_cast<Opcode>(opcode);
     }
@@ -20,29 +34,23 @@ Instruction int_to_instruction(int opcode)
     {
         string str_opcode = to_string(opcode);
         opcode = stoi(str_opcode.substr(str_opcode.length() - 2));
-        if(opcode >= 1 && opcode <= 8 || opcode == 99)
+        if(opcode >= 1 && opcode <= 9 || opcode == 99)
         {
             i.code = static_cast<Opcode>(opcode);
             if(str_opcode.length() == 5)
             {
-                if(str_opcode[0] == '1')
-                    i.param3_mode = Mode::immediate;
-                if(str_opcode[1] == '1')
-                    i.param2_mode = Mode::immediate;
-                if(str_opcode[2] == '1')
-                    i.param1_mode = Mode::immediate;
+                i.param3_mode = char_to_mode(str_opcode[0]);
+                i.param2_mode = char_to_mode(str_opcode[1]);
+                i.param1_mode = char_to_mode(str_opcode[2]);
             }
             else if(str_opcode.length() == 4)
             {
-                if(str_opcode[0] == '1')
-                    i.param2_mode = Mode::immediate;
-                if(str_opcode[1] == '1')
-                    i.param1_mode = Mode::immediate;
+                i.param2_mode = char_to_mode(str_opcode[0]);
+                i.param1_mode = char_to_mode(str_opcode[1]);
             }
             else if(str_opcode.length() == 3)
             {
-                if(str_opcode[0] == '1')
-                    i.param1_mode = Mode::immediate;
+                i.param1_mode = char_to_mode(str_opcode[0]);
             }
         }
     }
@@ -50,7 +58,7 @@ Instruction int_to_instruction(int opcode)
     return i;
 }
 
-Return_code get_value(Intcode_Program& program, Mode mode, int index, int& value)
+Return_code get_value(Intcode_Program& program, Mode mode, int index, int relative_base, Code& value)
 {
     Return_code code = Return_code::ok;
     if(program.find(index) == program.end())
@@ -59,11 +67,21 @@ Return_code get_value(Intcode_Program& program, Mode mode, int index, int& value
     }
     else if(mode == Mode::position && program.find(program.at(index)) == program.end())
     {
-        code = Return_code::wrong_index;
+        program[program.at(index)] = 0;
+        value = program.at(program.at(index));
     }
     else if(mode == Mode::position)
     {
         value = program.at(program.at(index));
+    }
+    else if(mode == Mode::relative && program.find(program.at(index) + relative_base) == program.end())
+    {
+        program[program.at(index) + relative_base] = 0;
+        value = program.at(program.at(index) + relative_base);
+    }
+    else if(mode == Mode::relative)
+    {
+        value = program.at(program.at(index) + relative_base);
     }
     else 
     {
@@ -72,15 +90,15 @@ Return_code get_value(Intcode_Program& program, Mode mode, int index, int& value
     return code;
 }
 
-Return_code opcode_operator(Intcode_Program& program, const Instruction& i, int index, bool add_operator = true)
+Return_code opcode_operator(Intcode_Program& program, const Instruction& i, int index, int relative_base)
 {
     Return_code code = Return_code::ok;
-    int a_value = -1;
-    int b_value = -1;
+    Code a_value = -1;
+    Code b_value = -1;
     if(
         index + 3 < program.size() &&
-        get_value(program, i.param1_mode, index + 1, a_value) == Return_code::ok &&
-        get_value(program, i.param2_mode, index + 2, b_value) == Return_code::ok
+        get_value(program, i.param1_mode, index + 1, relative_base, a_value) == Return_code::ok &&
+        get_value(program, i.param2_mode, index + 2, relative_base, b_value) == Return_code::ok
     )
     {
         if(i.code == Opcode::add)
@@ -107,15 +125,15 @@ Return_code opcode_operator(Intcode_Program& program, const Instruction& i, int 
     return code;
 }
 
-Return_code opcode_jump_if(Intcode_Program& program, const Instruction& i, int& index, bool jump_if_true = true)
+Return_code opcode_jump_if(Intcode_Program& program, const Instruction& i, int& index, int relative_base, bool jump_if_true)
 {
     Return_code code = Return_code::ok;
-    int a_value = -1;
-    int b_value = -1;
+    Code a_value = -1;
+    Code b_value = -1;
     if(
         index + 2 < program.size() &&
-        get_value(program, i.param1_mode, index + 1, a_value) == Return_code::ok && 
-        get_value(program, i.param2_mode, index + 2, b_value) == Return_code::ok
+        get_value(program, i.param1_mode, index + 1, relative_base, a_value) == Return_code::ok && 
+        get_value(program, i.param2_mode, index + 2, relative_base, b_value) == Return_code::ok
     )
     {
         if(jump_if_true && a_value != 0)
@@ -158,7 +176,7 @@ Return_code opcode_input(Intcode_Program& program, int index, Parameter_queue& i
     return code;
 }
 
-Return_code opcode_output(Intcode_Program& program, const Instruction& i, int index, Parameter_queue& outputs)
+Return_code opcode_output(Intcode_Program& program, const Instruction& i, int index, int relative_base, Parameter_queue& outputs)
 {
     Return_code code = Return_code::ok;
     if(index + 1 >= program.size())
@@ -172,6 +190,28 @@ Return_code opcode_output(Intcode_Program& program, const Instruction& i, int in
     else if(i.param1_mode == Mode::position && program.find(program.at(index + 1)) != program.end())
     {
         outputs.push(program.at(program.at(index+1)));
+    }
+    else if(i.param1_mode == Mode::relative && program.find(program.at(index + 1) + relative_base) != program.end())
+    {
+        outputs.push(program.at(program.at(index + 1) + relative_base));
+    }
+    else
+    {
+        code = Return_code::wrong_index;
+    }
+    
+    return code;
+}
+
+Return_code opcode_adjust_relative_base(Intcode_Program& program, const Instruction& i, int index, int& relative_base)
+{
+    Return_code code = Return_code::ok;
+
+    Code a_value = -1;
+    if(index + 1 < program.size() &&
+        get_value(program, i.param1_mode, index + 1, relative_base, a_value) == Return_code::ok)
+    {
+        relative_base += a_value;
     }
     else
     {
@@ -200,6 +240,7 @@ Computation_result compute(
     Intcode_Program p(program);
     Parameter_queue outputs;
     
+    int relative_base = 0;
     int param_index = 0;
     int cur_index = 0;
     Instruction i;
@@ -221,40 +262,37 @@ Computation_result compute(
         // Execute an operation 
         if(i.code == Opcode::times || i.code == Opcode::add || i.code == Opcode::equals || i.code == Opcode::less_than)
         {
-            c = opcode_operator(p, i, cur_index);
-            if(c != Return_code::ok)
-            {
-                break;
-            }
+            c = opcode_operator(p, i, cur_index, relative_base);
             cur_index += 4;
         }
         else if(i.code == Opcode::input)
         { 
             while(wait_for_inputs && input_queue.empty()) {}
             c = opcode_input(p, cur_index, input_queue);
-                        if(c != Return_code::ok)
-            {
-                break;
-            }
             cur_index += 2;
         }
         else if(i.code == Opcode::output)
         {
-            c = opcode_output(p, i, cur_index, outputs);
-            if(c != Return_code::ok)
+            c = opcode_output(p, i, cur_index, relative_base, outputs);
+            if(c == Return_code::ok)
             {
-                break;
+               output_callback(outputs.back());
             }
-            output_callback(outputs.back());
             cur_index += 2;
         }
         else if(i.code == Opcode::jump_if_true || i.code == Opcode::jump_if_false)
         {
-            c = opcode_jump_if(p, i, cur_index, i.code == Opcode::jump_if_true);
-            if(c != Return_code::ok)
-            {
-                break;
-            }
+            c = opcode_jump_if(p, i, cur_index, relative_base, i.code == Opcode::jump_if_true);
+        }
+        else if(i.code == Opcode::adjust_relative_base)
+        {
+            c = opcode_adjust_relative_base(p, i, cur_index, relative_base);
+            cur_index += 2;
+        }
+
+        if(c != Return_code::ok)
+        {
+            break;
         }
         
     } while(i.code != Opcode::end);
@@ -280,7 +318,7 @@ Intcode_Program parse_intcode_program_file(const std::string &file_path)
             {
                 if (!intcode.empty())
                 {
-                    program[index] = atoi(intcode.c_str());
+                    program[index] = stol(intcode.c_str());
                     index += 1;
                 }
             }
@@ -303,7 +341,7 @@ Intcode_Program parse_intcode_program_string(const std::string& intcode_program)
         {
             if (!intcode.empty())
             {
-                program[index] = atoi(intcode.c_str());
+                program[index] = stol(intcode.c_str());
                 index += 1;
             }
         }
