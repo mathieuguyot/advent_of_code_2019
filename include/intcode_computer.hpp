@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <queue>
+#include <functional>
 
 enum class Opcode {
     unknown = -1,
@@ -49,6 +50,7 @@ enum class Return_code {
 
 using Intcode_Program = std::map<int, int>;
 using Parameter_queue = std::queue<int>;
+using Ouput_callback = std::function<void(int)>;
 
 struct Computation_result {
     Return_code return_code;
@@ -56,7 +58,18 @@ struct Computation_result {
     Parameter_queue output_queue;
 };
 
-Computation_result compute(const Intcode_Program& program, const Parameter_queue& input = Parameter_queue());
+Computation_result compute(
+    const Intcode_Program& program
+);
+
+Computation_result compute(
+    const Intcode_Program& program,
+    Parameter_queue& input,
+    const Ouput_callback& output_callback = [](int output){},
+    bool wait_for_inputs =  false
+);
+
 Intcode_Program parse_intcode_program_file(const std::string& file_path);
+Intcode_Program parse_intcode_program_string(const std::string& intcode_program);
 
 #endif

@@ -7,6 +7,17 @@
 
 using namespace std;
 
+TEST_CASE("INTCODE_COMPUTER - parse_intcode_program_string", "[parse_intcode_program_string]")
+{
+    string str_program = "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0";
+    Intcode_Program program = parse_intcode_program_string(str_program);
+    REQUIRE(program.size() == 17);
+    REQUIRE(program[0] == 3);
+    REQUIRE(program[1] == 15);
+    REQUIRE(program[16] == 0);
+    REQUIRE(program[15] == 0);
+}
+
 TEST_CASE("INTCODE_COMPUTER - good path", "[parse_intcode_program]")
 {
     Intcode_Program program = parse_intcode_program_file("../data/aoc_2.txt");

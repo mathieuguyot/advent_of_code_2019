@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -165,12 +167,10 @@ Return_code opcode_output(Intcode_Program& program, const Instruction& i, int in
     }
     else if(i.param1_mode == Mode::immediate)
     {
-        cout << "OUTPUT=" << program.at(index+1) << endl;
         outputs.push(program.at(index+1));
     }
     else if(i.param1_mode == Mode::position && program.find(program.at(index + 1)) != program.end())
     {
-        cout << "OUTPUT=" << program.at(program.at(index+1)) << endl;
         outputs.push(program.at(program.at(index+1)));
     }
     else
@@ -181,13 +181,25 @@ Return_code opcode_output(Intcode_Program& program, const Instruction& i, int in
     return code;
 }
 
-Computation_result compute(const Intcode_Program& program, const Parameter_queue& input_queue)
+Computation_result compute(
+    const Intcode_Program& program
+)
+{
+    Parameter_queue input_queue;
+    return compute(program, input_queue);
+}
+
+Computation_result compute(
+    const Intcode_Program& program, 
+    Parameter_queue& input_queue, 
+    const Ouput_callback& output_callback, 
+    bool wait_for_inputs
+)
 {
     Return_code c = Return_code::ok;
     Intcode_Program p(program);
-    Parameter_queue inputs(input_queue);
     Parameter_queue outputs;
-
+    
     int param_index = 0;
     int cur_index = 0;
     Instruction i;
@@ -217,8 +229,9 @@ Computation_result compute(const Intcode_Program& program, const Parameter_queue
             cur_index += 4;
         }
         else if(i.code == Opcode::input)
-        {
-            c = opcode_input(p, cur_index, inputs);
+        { 
+            while(wait_for_inputs && input_queue.empty()) {}
+            c = opcode_input(p, cur_index, input_queue);
                         if(c != Return_code::ok)
             {
                 break;
@@ -232,6 +245,7 @@ Computation_result compute(const Intcode_Program& program, const Parameter_queue
             {
                 break;
             }
+            output_callback(outputs.back());
             cur_index += 2;
         }
         else if(i.code == Opcode::jump_if_true || i.code == Opcode::jump_if_false)
@@ -269,6 +283,28 @@ Intcode_Program parse_intcode_program_file(const std::string &file_path)
                     program[index] = atoi(intcode.c_str());
                     index += 1;
                 }
+            }
+        }
+    }
+
+    return program;
+}
+
+Intcode_Program parse_intcode_program_string(const std::string& intcode_program)
+{
+    Intcode_Program program;
+
+    if(!intcode_program.empty())
+    {
+        stringstream ss(intcode_program);
+        string intcode;
+        int index = 0;
+        while (getline(ss, intcode, ','))
+        {
+            if (!intcode.empty())
+            {
+                program[index] = atoi(intcode.c_str());
+                index += 1;
             }
         }
     }
