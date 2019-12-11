@@ -56,18 +56,19 @@ string decode_image(const std::string& image_data)
             {
                 if(image_data[index] == '0')
                 {
-                    color = '0';
+                    color = ' ';
                     break;
                 }
                 if(image_data[index] == '1')
                 {
-                    color = '1';
+                    color = '#';
                     break;
                 }
                 index += PIXELS_WIDE * PIXELS_TALL;
             }
             decoded_image_stream << color;
         }
+        decoded_image_stream << endl;
     }
     return decoded_image_stream.str();
 }

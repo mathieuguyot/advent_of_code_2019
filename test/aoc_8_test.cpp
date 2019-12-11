@@ -2,6 +2,7 @@
 
 #include "aoc_8.hpp"
 #include "utils.hpp"
+#include <sstream>
 
 using namespace std;
 
@@ -24,11 +25,17 @@ TEST_CASE("AOC8 - PART 2", "[decode_image]")
     std::string file_data = parse_image_data_file("../data/aoc_8.txt");
     string res = decode_image(file_data);
     
-    string expected_image = "011001001001100100101001010010101001001010100100101000011000100001100011110101101010010000101001001010010101001001010100100100111010010011001001010010";
+    stringstream ss_text;
+    ss_text << " ##  #  #  ##  #  # #  # " << endl;
+    ss_text << "#  # # #  #  # # #  #  # " << endl;
+    ss_text << "#    ##   #    ##   #### " << endl;
+    ss_text << "# ## # #  #    # #  #  # " << endl;
+    ss_text << "#  # # #  #  # # #  #  # " << endl;
+    ss_text << " ### #  #  ##  #  # #  # " << endl;
     
-    REQUIRE(res == expected_image);
+    REQUIRE(res == ss_text.str());
     
-    log_end_aoc_part(st, res, 8, 2);
+    log_end_aoc_part(st, "\n" + res, 8, 2);
 }
 
 TEST_CASE("AOC8 - good path", "[parse_image_data_file]") 
