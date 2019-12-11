@@ -12,9 +12,9 @@ TEST_CASE("AOC6 - PART 1", "[visit]")
     Galaxy galaxy = parse_galaxy_file("../data/aoc_6.txt");
     int res = galaxy.visit();
 
-    log_end_aoc_part(st, to_string(res), 6, 1);
-    
     REQUIRE(res == 154386);
+
+    log_end_aoc_part(st, to_string(res), 6, 1);
 }
 
 TEST_CASE("AOC6 - PART 2", "[get_distance]") 
@@ -24,9 +24,9 @@ TEST_CASE("AOC6 - PART 2", "[get_distance]")
     Galaxy galaxy = parse_galaxy_file("../data/aoc_6.txt");
     int res = galaxy.get_distance("YOU", "SAN") - 2;
 
-    log_end_aoc_part(st, to_string(res), 6, 2);
-    
     REQUIRE(res == 346);
+
+    log_end_aoc_part(st, to_string(res), 6, 2);
 }
 
 TEST_CASE("AOC6 - test galaxy visit", "[visit]") 

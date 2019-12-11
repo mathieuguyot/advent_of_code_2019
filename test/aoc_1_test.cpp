@@ -7,18 +7,14 @@ using namespace std;
 
 TEST_CASE("AOC1 - PART 1", "[compute_required_fuel_part_1]") 
 {
-    REQUIRE(compute_required_fuel_part_1({12}) == 2);
-    REQUIRE(compute_required_fuel_part_1({14}) == 2);
-    REQUIRE(compute_required_fuel_part_1({1969}) == 654);
-    REQUIRE(compute_required_fuel_part_1({100756}) == 33583);
-
     auto st = get_start_time();
 
     module_masses_t masses = parse_module_masses_file("../data/aoc_1.txt");
     int res = compute_required_fuel_part_1(masses);
     
-    log_end_aoc_part(st, to_string(res), 1, 1);
     REQUIRE(res == 3412496);
+
+    log_end_aoc_part(st, to_string(res), 1, 1);
 }
 
 TEST_CASE("AOC1 - PART 2", "[compute_required_fuel_part_2]") 
@@ -27,9 +23,19 @@ TEST_CASE("AOC1 - PART 2", "[compute_required_fuel_part_2]")
 
     module_masses_t masses = parse_module_masses_file("../data/aoc_1.txt");
     int res = compute_required_fuel_part_2(masses);
-    log_end_aoc_part(st, to_string(res), 1, 2);
     
     REQUIRE(res == 5115845);
+
+    log_end_aoc_part(st, to_string(res), 1, 2);
+}
+
+
+TEST_CASE("AOC1 - compute_required_fuel_part_1", "[parse_module_masses_file]") 
+{
+    REQUIRE(compute_required_fuel_part_1({12}) == 2);
+    REQUIRE(compute_required_fuel_part_1({14}) == 2);
+    REQUIRE(compute_required_fuel_part_1({1969}) == 654);
+    REQUIRE(compute_required_fuel_part_1({100756}) == 33583);
 }
 
 TEST_CASE("AOC1 - good path", "[parse_module_masses_file]") 

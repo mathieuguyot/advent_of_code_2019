@@ -12,9 +12,9 @@ TEST_CASE("AOC7 - PART 1", "[find_highest_thruster_signal]")
     Intcode_Program program = parse_intcode_program_file("../data/aoc_7.txt");
     int res = find_highest_thruster_signal(program);
     
-    log_end_aoc_part(st, to_string(res), 7, 1);
-
     REQUIRE(res == 79723);
+
+    log_end_aoc_part(st, to_string(res), 7, 1);
 }
 
 TEST_CASE("AOC7 - PART 2", "[find_highest_thruster_signal]") 
@@ -24,9 +24,9 @@ TEST_CASE("AOC7 - PART 2", "[find_highest_thruster_signal]")
     Intcode_Program program = parse_intcode_program_file("../data/aoc_7.txt");
     int res = find_highest_thruster_signal_loopback_mode(program);
     
-    log_end_aoc_part(st, to_string(res), 7, 2);
-
     REQUIRE(res == 70602018);
+
+    log_end_aoc_part(st, to_string(res), 7, 2);
 }
 
 TEST_CASE("AOC7 - test find_highest_thruster_signal", "[find_highest_thruster_signal]") 

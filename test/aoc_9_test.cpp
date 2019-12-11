@@ -13,11 +13,27 @@ TEST_CASE("AOC9 - PART 1", "[compute]")
     Intcode_Program program = parse_intcode_program_file("../data/aoc_9.txt");
     Parameter_queue inputs;
     inputs.push(1);
-    Computation_result res = compute(program, inputs, [](Code output){cout << "OUTPUT=" << output << endl;});
+    Computation_result res = compute(program, inputs);
+
+    REQUIRE(res.return_code == Return_code::ok);
+    REQUIRE(res.output_queue.back() == 3518157894);
 
     log_end_aoc_part(st, to_string(res.output_queue.back()), 9, 1);
+}
+
+TEST_CASE("AOC9 - PART 2", "[compute]") 
+{
+    auto st = get_start_time();
+
+    Intcode_Program program = parse_intcode_program_file("../data/aoc_9.txt");
+    Parameter_queue inputs;
+    inputs.push(2);
+    Computation_result res = compute(program, inputs);
+
     REQUIRE(res.return_code == Return_code::ok);
-    //REQUIRE(res.output_queue.back() == 15508323);
+    REQUIRE(res.output_queue.back() == 80379);
+
+    log_end_aoc_part(st, to_string(res.output_queue.back()), 9, 2);
 }
 
 TEST_CASE("AOC9 - relative parameter tests", "[compute]")
@@ -35,6 +51,7 @@ TEST_CASE("AOC9 - relative parameter tests", "[compute]")
     REQUIRE(str_code == "1125899906842624");
 
     program = parse_intcode_program_string("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99");
-    res = compute(program, inputs, [&](Code output){cout << "QUINE: " << output; });
+    res = compute(program, inputs);
     REQUIRE(res.return_code == Return_code::ok);
+    REQUIRE(res.output_queue.size() == 16);
 }

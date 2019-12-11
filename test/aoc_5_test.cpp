@@ -15,9 +15,11 @@ TEST_CASE("AOC5 - PART 1", "[compute]")
     inputs.push(1);
     Computation_result res = compute(program, inputs);
 
-    log_end_aoc_part(st, to_string(res.output_queue.back()), 5, 1);
     REQUIRE(res.return_code == Return_code::ok);
     REQUIRE(res.output_queue.back() == 15508323);
+
+    log_end_aoc_part(st, to_string(res.output_queue.back()), 5, 1);
+    
 }
 
 TEST_CASE("AOC5 - PART 2", "[compute]") 
@@ -29,7 +31,8 @@ TEST_CASE("AOC5 - PART 2", "[compute]")
     inputs.push(5);
     Computation_result res = compute(program, inputs);
 
-    log_end_aoc_part(st, to_string(res.output_queue.back()), 5, 1);
     REQUIRE(res.return_code == Return_code::ok);
     REQUIRE(res.output_queue.back() == 9006327);
+
+    log_end_aoc_part(st, to_string(res.output_queue.back()), 5, 1);
 }

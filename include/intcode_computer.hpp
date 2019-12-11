@@ -6,7 +6,7 @@
 #include <queue>
 #include <functional>
 
-using Code = long;
+using Code = long long;
 
 enum class Opcode {
     unknown = -1,

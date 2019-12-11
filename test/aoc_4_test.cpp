@@ -11,9 +11,9 @@ TEST_CASE("AOC4 - PART 1", "[find_corrects_passwords]")
 
     auto res = find_correct_passwords();
     
-    log_end_aoc_part(st, to_string(res.size()), 4, 1);
-
     REQUIRE(res.size() == 1610);
+
+    log_end_aoc_part(st, to_string(res.size()), 4, 1);
 }
 
 TEST_CASE("AOC4 - PART 2", "[find_correct_passwords_part_two]") 
@@ -22,7 +22,7 @@ TEST_CASE("AOC4 - PART 2", "[find_correct_passwords_part_two]")
 
     auto res = find_correct_passwords_part_two();
     
-    log_end_aoc_part(st, to_string(res.size()), 4, 2);
-
     REQUIRE(res.size() == 1104);
+
+    log_end_aoc_part(st, to_string(res.size()), 4, 2);
 }

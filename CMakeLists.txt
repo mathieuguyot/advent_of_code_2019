@@ -43,6 +43,8 @@ set(SRC_TEST
     test/aoc_test_main.cpp
 )
 
+set(CMAKE_BUILD_TYPE Debug)
+
 find_package(Threads)
 
 add_library(aoc_2019_lib ${SOURCES_FILES_LIB} ${HEADERS_FILES})

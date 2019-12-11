@@ -98,24 +98,25 @@ Return_code opcode_operator(Intcode_Program& program, const Instruction& i, int 
     if(
         index + 3 < program.size() &&
         get_value(program, i.param1_mode, index + 1, relative_base, a_value) == Return_code::ok &&
-        get_value(program, i.param2_mode, index + 2, relative_base, b_value) == Return_code::ok
+        get_value(program, i.param2_mode, index + 2, relative_base, b_value) == Return_code::ok 
     )
     {
+        int write_index = i.param3_mode == Mode::position ? program[index + 3] : program[index + 3] + relative_base;
         if(i.code == Opcode::add)
         {
-            program[program[index + 3]] = a_value + b_value;
+            program[write_index] = a_value + b_value;
         }
         else if(i.code == Opcode::times)
         {
-            program[program[index + 3]] = a_value * b_value;
+            program[write_index] = a_value * b_value;
         }
         else if(i.code == Opcode::equals)
         {
-            program[program[index + 3]] = a_value == b_value ? 1 : 0;
+            program[write_index] = a_value == b_value ? 1 : 0;
         }
         else if(i.code == Opcode::less_than)
         {
-            program[program[index + 3]] = a_value < b_value ? 1 : 0;
+            program[write_index] = a_value < b_value ? 1 : 0;
         }
     }
     else
@@ -157,7 +158,7 @@ Return_code opcode_jump_if(Intcode_Program& program, const Instruction& i, int& 
     return code;
 }
 
-Return_code opcode_input(Intcode_Program& program, int index, Parameter_queue& inputs)
+Return_code opcode_input(Intcode_Program& program, const Instruction& i, int index, int relative_base, Parameter_queue& inputs)
 {
     Return_code code = Return_code::ok;
     if(inputs.size() == 0)
@@ -170,8 +171,9 @@ Return_code opcode_input(Intcode_Program& program, int index, Parameter_queue& i
     }
     else
     {
-        program[program[index + 1]] = inputs.front();
-        inputs.pop();  
+        int write_index = i.param1_mode == Mode::position ? program[index + 1] : program[index + 1] + relative_base;
+        program[write_index] = inputs.front();
+        inputs.pop();
     }
     return code;
 }
@@ -268,7 +270,7 @@ Computation_result compute(
         else if(i.code == Opcode::input)
         { 
             while(wait_for_inputs && input_queue.empty()) {}
-            c = opcode_input(p, cur_index, input_queue);
+            c = opcode_input(p, i, cur_index, relative_base, input_queue);
             cur_index += 2;
         }
         else if(i.code == Opcode::output)
@@ -318,7 +320,7 @@ Intcode_Program parse_intcode_program_file(const std::string &file_path)
             {
                 if (!intcode.empty())
                 {
-                    program[index] = stol(intcode.c_str());
+                    program[index] = stoll(intcode.c_str());
                     index += 1;
                 }
             }
@@ -341,7 +343,7 @@ Intcode_Program parse_intcode_program_string(const std::string& intcode_program)
         {
             if (!intcode.empty())
             {
-                program[index] = stol(intcode.c_str());
+                program[index] = stoll(intcode.c_str());
                 index += 1;
             }
         }

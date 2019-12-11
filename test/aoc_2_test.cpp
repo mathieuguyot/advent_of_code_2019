@@ -15,9 +15,10 @@ TEST_CASE("AOC2 - PART 1", "[compute]")
     program[2] = 2;
     Computation_result res = compute(program);
 
-    log_end_aoc_part(st, to_string(res.program[0]), 2, 1);
     REQUIRE(res.return_code == Return_code::ok);
     REQUIRE(res.program[0] == 6568671);
+
+    log_end_aoc_part(st, to_string(res.program[0]), 2, 1);
 }
 
 TEST_CASE("AOC2 - PART 2", "[find_noun_and_verb]") 
@@ -27,6 +28,7 @@ TEST_CASE("AOC2 - PART 2", "[find_noun_and_verb]")
     Intcode_Program program = parse_intcode_program_file("../data/aoc_2.txt");
     int res = find_noun_and_verb(program);
 
-    log_end_aoc_part(st, to_string(res), 2, 2);
     REQUIRE(res == 3951);
+
+    log_end_aoc_part(st, to_string(res), 2, 2);
 }

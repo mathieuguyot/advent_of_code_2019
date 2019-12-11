@@ -15,8 +15,9 @@ TEST_CASE("AOC3 - PART 1", "[find_intersection_points]")
     points_set s = find_intersection_points(lines, {1,1});
     int res = find_shortest_manhattan_distance(s, {1, 1});
 
-    log_end_aoc_part(st, to_string(res), 3, 1);
     REQUIRE(res == 245);
+
+    log_end_aoc_part(st, to_string(res), 3, 1);
 }
 
 TEST_CASE("AOC3 - PART 2", "[find_lowest_weighted_point]") 
@@ -27,8 +28,9 @@ TEST_CASE("AOC3 - PART 2", "[find_lowest_weighted_point]")
     points_set s = find_intersection_points(lines, {1,1});
     int res = find_lowest_weighted_point(s);
 
-    log_end_aoc_part(st, to_string(res), 3, 2);
     REQUIRE(res == 48262);
+
+    log_end_aoc_part(st, to_string(res), 3, 2);
 }
 
 TEST_CASE("AOC3 - nominal test", "[find_intersection_points]") 
