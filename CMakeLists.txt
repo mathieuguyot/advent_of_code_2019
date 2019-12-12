@@ -14,6 +14,7 @@ set(SOURCES_FILES_LIB
     src/aoc_6.cpp
     src/aoc_7.cpp
     src/aoc_8.cpp
+    src/aoc_10.cpp
     src/aoc_11.cpp
     src/intcode_computer.cpp
 )
@@ -26,6 +27,7 @@ set(HEADERS_FILES
     include/aoc_6.hpp
     include/aoc_7.hpp
     include/aoc_8.hpp
+    include/aoc_10.hpp
     include/aoc_11.hpp
     include/intcode_computer.hpp
     include/utils.hpp
@@ -41,6 +43,7 @@ set(SRC_TEST
     test/aoc_7_test.cpp
     test/aoc_8_test.cpp
     test/aoc_9_test.cpp
+    test/aoc_10_test.cpp
     test/aoc_11_test.cpp
     test/intcode_computer_test.cpp
     test/aoc_test_main.cpp

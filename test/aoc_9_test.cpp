@@ -1,6 +1,5 @@
 #include <catch2/catch.hpp>
 
-#include "aoc_2.hpp"
 #include "intcode_computer.hpp"
 #include "utils.hpp"
 
