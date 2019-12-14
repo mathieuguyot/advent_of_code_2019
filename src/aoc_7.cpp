@@ -41,32 +41,36 @@ int run_sequence_loopback_mode(const Intcode_Program& program, const std::vector
     input_queues_3.push(phases[3]);
     input_queues_4.push(phases[4]);
 
-    std::function<void(int)> output_callback_0 = [&](int output) {
+    Ouput_callback output_callback_0 = [&](int output) {
         input_queues_1.push(output);
     };
 
-    std::function<void(int)> output_callback_1 = [&](int output) {
+    Ouput_callback output_callback_1 = [&](int output) {
         input_queues_2.push(output);
     };
 
-    std::function<void(int)> output_callback_2 = [&](int output) {
+    Ouput_callback output_callback_2 = [&](int output) {
         input_queues_3.push(output);
     };
 
-    std::function<void(int)> output_callback_3 = [&](int output) {
+    Ouput_callback output_callback_3 = [&](int output) {
         input_queues_4.push(output);
     };
 
-    std::function<void(int)> output_callback_4 = [&](int output) {
+    Ouput_callback output_callback_4 = [&](int output) {
         input_queues_0.push(output);
         output_signal = output;
     };
 
-    thread computation_1([&]{compute(program, std::ref(input_queues_1), output_callback_1, true);});
-    thread computation_2([&]{compute(program, std::ref(input_queues_2), output_callback_2, true);});
-    thread computation_3([&]{compute(program, std::ref(input_queues_3), output_callback_3, true);});
-    thread computation_4([&]{compute(program, std::ref(input_queues_4), output_callback_4, true);});
-    thread computation_0([&]{compute(program, std::ref(input_queues_0), output_callback_0, true);});
+    Input_callback input_callback = [](Parameter_queue& input_queue) {
+        while(input_queue.empty()){}
+    };
+
+    thread computation_1([&]{compute(program, std::ref(input_queues_1), output_callback_1, input_callback);});
+    thread computation_2([&]{compute(program, std::ref(input_queues_2), output_callback_2, input_callback);});
+    thread computation_3([&]{compute(program, std::ref(input_queues_3), output_callback_3, input_callback);});
+    thread computation_4([&]{compute(program, std::ref(input_queues_4), output_callback_4, input_callback);});
+    thread computation_0([&]{compute(program, std::ref(input_queues_0), output_callback_0, input_callback);});
 
     computation_0.join();
     computation_1.join();

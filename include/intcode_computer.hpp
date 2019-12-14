@@ -55,6 +55,7 @@ enum class Return_code {
 using Intcode_Program = std::map<Code, Code>;
 using Parameter_queue = std::queue<Code>;
 using Ouput_callback = std::function<void(Code)>;
+using Input_callback = std::function<void(Parameter_queue& input_queue)>;
 
 struct Computation_result {
     Return_code return_code;
@@ -70,7 +71,7 @@ Computation_result compute(
     const Intcode_Program& program,
     Parameter_queue& input,
     const Ouput_callback& output_callback = [](Code output){},
-    bool wait_for_inputs =  false
+    const Input_callback& input_callback = [](Parameter_queue& input_queue){}
 );
 
 Intcode_Program parse_intcode_program_file(const std::string& file_path);

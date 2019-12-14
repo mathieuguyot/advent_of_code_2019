@@ -235,7 +235,7 @@ Computation_result compute(
     const Intcode_Program& program, 
     Parameter_queue& input_queue, 
     const Ouput_callback& output_callback, 
-    bool wait_for_inputs
+    const Input_callback& input_callback
 )
 {
     Return_code c = Return_code::ok;
@@ -269,7 +269,7 @@ Computation_result compute(
         }
         else if(i.code == Opcode::input)
         { 
-            while(wait_for_inputs && input_queue.empty()) {}
+            input_callback(input_queue);
             c = opcode_input(p, i, cur_index, relative_base, input_queue);
             cur_index += 2;
         }
